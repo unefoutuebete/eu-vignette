@@ -405,6 +405,7 @@
     </button>
   </nav>
 
+  <script src="geo-data.js"></script>
   <script>
     const STATUS = {
       valid:       { label: 'Valid vignette',            color: '#33c759' },
@@ -438,25 +439,39 @@
         options:[["7 days","MDL varies"],["15 days","MDL varies"],["30 days","MDL varies"]], tips:["Confirm route coverage before purchase."], url:"https://vinieta.gov.md/en/" }
     ];
 
-    // Simplified polygons [lat, lng] — mirrors iOS EuropeBoundaries.swift
-    const boundaries = [
-      { id:"AT", name:"Austria", requiresVignette:true, coords:[[47.27,9.53],[47.59,12],[48.77,13.02],[48.98,14.5],[48.72,16.95],[48.12,17.16],[47.06,16.95],[46.62,16.2],[46.4,14.98],[46.51,13.7],[46.61,12.38],[47.05,10.55]] },
-      { id:"CH", name:"Switzerland", requiresVignette:true, coords:[[47.81,7.59],[47.53,8.52],[47.27,9.53],[47.05,10.55],[46.8,10.4],[46.2,8.96],[45.92,7.05],[46.15,6.14],[46.78,6.02],[47.48,6.75]] },
-      { id:"SI", name:"Slovenia", requiresVignette:true, coords:[[46.55,13.7],[46.4,14.98],[46.62,16.2],[46.87,16.6],[46.55,16.52],[45.78,15.65],[45.42,15.2],[45.47,14.11],[45.6,13.7],[46,13.38]] },
-      { id:"HU", name:"Hungary", requiresVignette:true, coords:[[48.58,22.9],[48.58,16.11],[47.77,16.58],[46.72,16.58],[46.07,18.83],[45.75,20.25],[46.22,21.03],[46.37,22.9],[47.95,22.9]] },
-      { id:"CZ", name:"Czech Republic", requiresVignette:true, coords:[[50.08,12.1],[50.77,14.8],[51.05,15.02],[50.98,16.85],[50.35,18.85],[49.58,18.85],[48.98,17.16],[48.58,16.95],[48.63,6.87]] },
-      { id:"SK", name:"Slovakia", requiresVignette:true, coords:[[49.58,18.85],[50.35,18.85],[50.98,16.85],[51.05,15.02],[50.77,14.8],[50.08,12.1],[48.63,6.87],[48.58,16.95],[48.98,17.16]] },
-      { id:"RO", name:"Romania", requiresVignette:true, coords:[[48.22,20.22],[47.97,22.87],[47.66,25],[46.2,28.2],[44.95,28.6],[43.68,28.05],[43.62,27.5],[44.2,22.7],[45.42,20.22],[46.2,21],[47.06,16.95],[48.12,17.16]] },
-      { id:"BG", name:"Bulgaria", requiresVignette:true, coords:[[44.2,22.7],[43.62,27.5],[43.68,28.05],[42,27.9],[41.24,26.1],[41.98,22.5],[43.68,22.4]] },
-      { id:"MD", name:"Moldova", requiresVignette:true, coords:[[48.49,26.62],[48.22,27.65],[47.97,28.9],[46.2,28.2],[47.66,25],[47.97,22.87]] },
-      { id:"DE", name:"Germany", requiresVignette:false, coords:[[55.06,8.5],[54.8,13.8],[53.55,14.7],[51.27,15.02],[50.08,12.1],[48.63,6.87],[47.81,7.59],[47.05,10.55],[47.59,12],[50.08,12.1],[51.27,15.02],[50.98,16.85],[50.35,18.85],[49.58,18.85],[48.98,17.16],[48.58,16.95]] },
-      { id:"PL", name:"Poland", requiresVignette:false, coords:[[54.8,14.2],[54.35,19.4],[52.35,23.5],[49,24],[49.58,18.85],[50.98,16.85],[51.27,15.02],[53.55,14.7]] },
-      { id:"IT", name:"Italy", requiresVignette:false, coords:[[46.8,10.4],[46.2,8.96],[45.92,7.05],[44.2,7.05],[43.78,7.52],[43.6,10.5],[44.1,12.4],[45.47,13.7],[45.42,15.2],[45.78,15.65],[46.55,16.52],[46.87,16.6],[46.62,16.2],[46.4,14.98],[46.55,13.7],[46,13.38],[45.6,13.7]] },
-      { id:"FR", name:"France", requiresVignette:false, coords:[[47.48,6.75],[46.78,6.02],[46.15,6.14],[45.92,7.05],[44.2,7.05],[43.78,7.52],[43.6,10.5],[44.1,12.4],[43.5,3.5],[42.35,3.05],[43.4,-1.8],[46.2,-1.3],[48.85,-4.8],[49.7,1.6],[50.95,1.8],[51.05,2.55],[50.95,4.4],[50.08,4.7],[49.55,6.2]] },
-      { id:"HR", name:"Croatia", requiresVignette:false, coords:[[46.55,13.7],[46,13.38],[45.6,13.7],[45.47,13.7],[44.1,12.4],[43.6,10.5],[43.78,7.52],[44.2,7.05],[45.42,15.2],[45.78,15.65],[46.55,16.52]] },
-      { id:"RS", name:"Serbia", requiresVignette:false, coords:[[46.2,21],[45.42,20.22],[44.2,22.7],[43.68,22.4],[41.98,22.5],[42.25,20.3],[43.2,19],[44.8,19]] },
-      { id:"UA", name:"Ukraine", requiresVignette:false, coords:[[48.49,26.62],[48.22,27.65],[47.97,28.9],[46.2,28.2],[47.66,25],[47.97,22.87],[48.22,20.22],[48.12,17.16],[48.58,16.95],[49.58,18.85],[49,24],[52.35,23.5],[54.8,14.2],[55.06,8.5],[52.35,23.5],[50.35,24]] }
-    ];
+    // Real country shapes from Natural Earth (see geo-data.js / europe-countries.geojson)
+    function largestRing(geometry) {
+      if (geometry.type === 'Polygon') return geometry.coordinates[0];
+      if (geometry.type === 'MultiPolygon') {
+        const rings = geometry.coordinates.map(p => p[0]);
+        return rings.reduce((a, b) => a.length >= b.length ? a : b);
+      }
+      return [];
+    }
+
+    const boundaries = EUROPE_GEOJSON.features.map(f => ({
+      id: f.properties.id,
+      name: f.properties.name,
+      requiresVignette: f.properties.requiresVignette,
+      ring: largestRing(f.geometry)
+    }));
+
+    function computeMapBounds(items) {
+      let minLng = Infinity, maxLng = -Infinity, minLat = Infinity, maxLat = -Infinity;
+      items.forEach(b => b.ring.forEach(([lng, lat]) => {
+        minLng = Math.min(minLng, lng); maxLng = Math.max(maxLng, lng);
+        minLat = Math.min(minLat, lat); maxLat = Math.max(maxLat, lat);
+      }));
+      const padLng = (maxLng - minLng) * 0.035;
+      const padLat = (maxLat - minLat) * 0.035;
+      return {
+        minLng: minLng - padLng, maxLng: maxLng + padLng,
+        minLat: minLat - padLat, maxLat: maxLat + padLat,
+        w: 900, h: 620
+      };
+    }
+
+    let PROJ = computeMapBounds(boundaries);
 
     function startOfDay(d) {
       const x = new Date(d);
@@ -523,28 +538,27 @@
     // --- SVG Map (no external CDN — works on htmlpreview & phone) ---
     let selectedDayOffset = 0;
     const svgShapes = {};
-    const PROJ = { minLng: -5, maxLng: 32, minLat: 40, maxLat: 56.5, w: 900, h: 620 };
 
-    function project(lat, lng) {
+    function project(lng, lat) {
       const x = ((lng - PROJ.minLng) / (PROJ.maxLng - PROJ.minLng)) * PROJ.w;
       const y = ((PROJ.maxLat - lat) / (PROJ.maxLat - PROJ.minLat)) * PROJ.h;
       return [x, y];
     }
 
-    function polygonPoints(coords) {
-      return coords.map(([lat, lng]) => {
-        const [x, y] = project(lat, lng);
-        return `${x.toFixed(1)},${y.toFixed(1)}`;
+    function polygonPoints(ring) {
+      return ring.map(([lng, lat]) => {
+        const [x, y] = project(lng, lat);
+        return `${x.toFixed(2)},${y.toFixed(2)}`;
       }).join(' ');
     }
 
-    function centroid(coords) {
+    function ringCentroid(ring) {
       let sx = 0, sy = 0;
-      coords.forEach(([lat, lng]) => {
-        const [x, y] = project(lat, lng);
+      ring.forEach(([lng, lat]) => {
+        const [x, y] = project(lng, lat);
         sx += x; sy += y;
       });
-      return [sx / coords.length, sy / coords.length];
+      return [sx / ring.length, sy / ring.length];
     }
 
     function initMap() {
@@ -559,16 +573,16 @@
         g.setAttribute('data-id', b.id);
 
         const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        poly.setAttribute('points', polygonPoints(b.coords));
+        poly.setAttribute('points', polygonPoints(b.ring));
         poly.setAttribute('class', 'country-shape');
         poly.addEventListener('click', () => openSheet(b.id));
         g.appendChild(poly);
 
         if (b.requiresVignette) {
-          const [cx, cy] = centroid(b.coords);
+          const [cx, cy] = ringCentroid(b.ring);
           const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          label.setAttribute('x', cx.toFixed(1));
-          label.setAttribute('y', (cy + 4).toFixed(1));
+          label.setAttribute('x', cx.toFixed(2));
+          label.setAttribute('y', (cy + 4).toFixed(2));
           label.setAttribute('class', 'country-label');
           label.textContent = b.id;
           g.appendChild(label);
@@ -585,7 +599,7 @@
     function initMapPanZoom() {
       const svg = document.getElementById('europe-map');
       const canvas = document.getElementById('map-canvas');
-      let viewBox = { x: 0, y: 0, w: 900, h: 620 };
+      let viewBox = { x: 0, y: 0, w: PROJ.w, h: PROJ.h };
       let dragging = false, last = null;
 
       function applyViewBox() {
