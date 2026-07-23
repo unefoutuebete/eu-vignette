@@ -6,7 +6,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>EU Vignette — Demo</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <style>
     :root {
       --blue: #2566e6;
@@ -33,9 +32,12 @@
       flex-direction: column;
       -webkit-tap-highlight-color: transparent;
     }
-    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; padding-bottom: calc(64px + var(--safe-bottom)); }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
     .screen.active { display: flex; }
-    .screen-map { padding-bottom: calc(64px + var(--safe-bottom)); }
+    .screen-map {
+      height: calc(100dvh - 64px - var(--safe-bottom));
+      max-height: calc(100dvh - 64px - var(--safe-bottom));
+    }
     .nav {
       background: rgba(242,242,247,0.92);
       backdrop-filter: blur(20px);
@@ -122,26 +124,63 @@
     .hero p { font-size: 15px; color: var(--secondary); line-height: 1.4; }
 
     /* Map screen */
-    .map-wrap { flex: 1; position: relative; min-height: 320px; }
-    #map { width: 100%; height: 100%; min-height: 320px; z-index: 1; }
-    .map-overlay {
-      position: absolute; left: 0; right: 0; bottom: 0; z-index: 500;
-      pointer-events: none;
+    .map-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
     }
-    .map-overlay > * { pointer-events: auto; }
+    .map-canvas {
+      flex: 1;
+      min-height: 240px;
+      background: linear-gradient(180deg, #c8daf0 0%, #e8eef5 100%);
+      touch-action: none;
+      position: relative;
+    }
+    #europe-map {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    #europe-map:active { cursor: grabbing; }
+    .country-shape {
+      stroke: rgba(255,255,255,0.85);
+      stroke-width: 1.2;
+      stroke-linejoin: round;
+      transition: fill 0.2s ease, opacity 0.2s ease;
+      cursor: pointer;
+    }
+    .country-shape:active { opacity: 0.85; }
+    .country-label {
+      font-size: 11px;
+      font-weight: 600;
+      fill: rgba(0,0,0,0.55);
+      pointer-events: none;
+      text-anchor: middle;
+    }
+    .map-controls {
+      flex-shrink: 0;
+      background: var(--bg);
+      border-top: 0.5px solid var(--separator);
+      padding-bottom: 4px;
+    }
     .legend {
       display: flex; flex-wrap: wrap; gap: 6px 10px;
       margin: 8px 12px 0; padding: 8px 10px;
-      background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
-      border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
       font-size: 10px;
     }
     .legend-item { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
     .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .timeline-panel {
       margin: 8px 12px 10px; padding: 14px;
-      background: rgba(255,255,255,0.94); backdrop-filter: blur(12px);
-      border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
     .timeline-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .timeline-date { font-size: 16px; font-weight: 600; }
@@ -205,8 +244,19 @@
   <div id="screen-map" class="screen screen-map active">
     <div class="nav compact"><h1>Map</h1></div>
     <div class="map-wrap">
-      <div id="map"></div>
-      <div class="map-overlay">
+      <div class="map-canvas" id="map-canvas">
+        <svg id="europe-map" viewBox="0 0 900 620" preserveAspectRatio="xMidYMid meet" aria-label="Europe vignette map">
+          <rect width="900" height="620" fill="url(#sea)" />
+          <defs>
+            <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#b8cfe8"/>
+              <stop offset="100%" stop-color="#dbe6f2"/>
+            </linearGradient>
+          </defs>
+          <g id="countries-layer"></g>
+        </svg>
+      </div>
+      <div class="map-controls">
         <div class="legend" id="legend"></div>
         <div class="timeline-panel">
           <div class="timeline-header">
@@ -354,7 +404,6 @@
     </button>
   </nav>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
     const STATUS = {
       valid:       { label: 'Valid vignette',            color: '#33c759' },
@@ -470,38 +519,120 @@
       return demoVignettes.find(v => v.countryID === countryID && v.purchase <= day && day <= v.expiry);
     }
 
-    // --- Map ---
-    let map, polygonLayers = {};
+    // --- SVG Map (no external CDN — works on htmlpreview & phone) ---
     let selectedDayOffset = 0;
+    const svgShapes = {};
+    const PROJ = { minLng: -5, maxLng: 32, minLat: 40, maxLat: 56.5, w: 900, h: 620 };
+
+    function project(lat, lng) {
+      const x = ((lng - PROJ.minLng) / (PROJ.maxLng - PROJ.minLng)) * PROJ.w;
+      const y = ((PROJ.maxLat - lat) / (PROJ.maxLat - PROJ.minLat)) * PROJ.h;
+      return [x, y];
+    }
+
+    function polygonPoints(coords) {
+      return coords.map(([lat, lng]) => {
+        const [x, y] = project(lat, lng);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+    }
+
+    function centroid(coords) {
+      let sx = 0, sy = 0;
+      coords.forEach(([lat, lng]) => {
+        const [x, y] = project(lat, lng);
+        sx += x; sy += y;
+      });
+      return [sx / coords.length, sy / coords.length];
+    }
 
     function initMap() {
-      map = L.map('map', { zoomControl: false, attributionControl: false })
-        .setView([48.5, 17.5], 5);
+      const layer = document.getElementById('countries-layer');
+      const ordered = [
+        ...boundaries.filter(b => !b.requiresVignette),
+        ...boundaries.filter(b => b.requiresVignette)
+      ];
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 12
-      }).addTo(map);
+      ordered.forEach(b => {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('data-id', b.id);
 
-      // Draw gray countries first, vignette countries on top
-      [...boundaries.filter(b => !b.requiresVignette), ...boundaries.filter(b => b.requiresVignette)]
-        .forEach(b => {
-          const layer = L.polygon(b.coords, { weight: 1.5, fillOpacity: 0.55 })
-            .addTo(map)
-            .on('click', () => openSheet(b.id));
-          polygonLayers[b.id] = layer;
-        });
+        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        poly.setAttribute('points', polygonPoints(b.coords));
+        poly.setAttribute('class', 'country-shape');
+        poly.addEventListener('click', () => openSheet(b.id));
+        g.appendChild(poly);
+
+        if (b.requiresVignette) {
+          const [cx, cy] = centroid(b.coords);
+          const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          label.setAttribute('x', cx.toFixed(1));
+          label.setAttribute('y', (cy + 4).toFixed(1));
+          label.setAttribute('class', 'country-label');
+          label.textContent = b.id;
+          g.appendChild(label);
+        }
+
+        layer.appendChild(g);
+        svgShapes[b.id] = poly;
+      });
 
       updateMapColors();
-      setTimeout(() => map.invalidateSize(), 100);
+      initMapPanZoom();
+    }
+
+    function initMapPanZoom() {
+      const svg = document.getElementById('europe-map');
+      const canvas = document.getElementById('map-canvas');
+      let viewBox = { x: 0, y: 0, w: 900, h: 620 };
+      let dragging = false, last = null;
+
+      function applyViewBox() {
+        svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+      }
+
+      canvas.addEventListener('pointerdown', e => {
+        if (e.target.closest('.country-shape')) return;
+        dragging = true;
+        last = { x: e.clientX, y: e.clientY };
+        canvas.setPointerCapture(e.pointerId);
+      });
+      canvas.addEventListener('pointermove', e => {
+        if (!dragging || !last) return;
+        const rect = canvas.getBoundingClientRect();
+        const dx = (e.clientX - last.x) * (viewBox.w / rect.width);
+        const dy = (e.clientY - last.y) * (viewBox.h / rect.height);
+        viewBox.x -= dx;
+        viewBox.y -= dy;
+        last = { x: e.clientX, y: e.clientY };
+        applyViewBox();
+      });
+      canvas.addEventListener('pointerup', () => { dragging = false; last = null; });
+      canvas.addEventListener('pointercancel', () => { dragging = false; last = null; });
+
+      canvas.addEventListener('wheel', e => {
+        e.preventDefault();
+        const factor = e.deltaY > 0 ? 1.08 : 0.92;
+        const rect = canvas.getBoundingClientRect();
+        const mx = ((e.clientX - rect.left) / rect.width) * viewBox.w + viewBox.x;
+        const my = ((e.clientY - rect.top) / rect.height) * viewBox.h + viewBox.y;
+        viewBox.w *= factor;
+        viewBox.h *= factor;
+        viewBox.x = mx - (mx - viewBox.x) * factor;
+        viewBox.y = my - (my - viewBox.y) * factor;
+        applyViewBox();
+      }, { passive: false });
     }
 
     function updateMapColors() {
       const date = addDays(today, selectedDayOffset);
-      Object.entries(polygonLayers).forEach(([id, layer]) => {
+      Object.entries(svgShapes).forEach(([id, poly]) => {
         const s = getStatus(id, date);
         const color = STATUS[s].color;
-        const opacity = s === 'notRequired' ? 0.35 : 0.62;
-        layer.setStyle({ color, fillColor: color, fillOpacity: opacity, weight: s === 'notRequired' ? 1 : 1.5 });
+        const opacity = s === 'notRequired' ? 0.45 : 0.78;
+        poly.setAttribute('fill', color);
+        poly.setAttribute('fill-opacity', opacity);
+        poly.setAttribute('stroke-width', s === 'notRequired' ? '0.8' : '1.2');
       });
       document.getElementById('timeline-date').textContent = fmtDate(date);
       document.getElementById('today-pill').style.display = selectedDayOffset === 0 ? 'inline' : 'none';
@@ -633,7 +764,6 @@
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById('screen-' + name).classList.add('active');
       if (name === 'detail') document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      if (name === 'map') setTimeout(() => map && map.invalidateSize(), 150);
     }
 
     function switchTab(tab) {
