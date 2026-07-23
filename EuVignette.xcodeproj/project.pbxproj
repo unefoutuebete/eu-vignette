@@ -188,6 +188,14 @@
 			path = Map;
 			sourceTree = "<group>";
 		};
+		F1A2B3C4D5E6478990ABCDEF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4F6BC8C4971348C9B45A67D7 /* europe-countries.geojson */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
