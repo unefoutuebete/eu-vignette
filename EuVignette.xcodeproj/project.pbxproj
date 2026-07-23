@@ -1,0 +1,391 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E580AFD85D274CB5AFEF96C5 /* EuVignetteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFE98C2653D4AB0AE618785 /* EuVignetteApp.swift */; };
+		91D958614AE14A3F968B3716 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8983D4B5C8234BD5BB5E1DFA /* ContentView.swift */; };
+		326D66F60816409190564E4D /* VignetteCountry.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD24F9101C7E4926878C42D6 /* VignetteCountry.swift */; };
+		D5BDA80FD6354856A527ACF0 /* SavedVignette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F12F0E158E0484F88AD5421 /* SavedVignette.swift */; };
+		97BFA7F615A64DA08C99E435 /* TripPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EBDAC2CA5F496CA4444C8E /* TripPlan.swift */; };
+		7953EADE708D4CE5AF6A93F4 /* CountryCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47D29C326144BEEB949317E /* CountryCatalog.swift */; };
+		C1CD33656C3249BEBE8B91E8 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4947BC0CFF74A5CB6C33D96 /* NotificationManager.swift */; };
+		0937309A85424E6FA774D5F6 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FB1D1367A741929D1951A2 /* UserSettings.swift */; };
+		7C3EE93AB9DE428D84BBBEAE /* CountryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90C40F0C11584042B8C9D48B /* CountryListView.swift */; };
+		0BF400BF29AA45A0A3487171 /* CountryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECF23AEC1289433199B22FE0 /* CountryDetailView.swift */; };
+		0A3411261237400B9CF72DD6 /* MyVignettesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C9143085C2456E976F8EAE /* MyVignettesView.swift */; };
+		5D2FB701E177472ABF3D58C3 /* AddVignetteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756C72AFFADB41D1B206E6B1 /* AddVignetteView.swift */; };
+		F29F5B002A224D098D1EE3BA /* TripPlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFF5FFE9E5934B7684BD3F6C /* TripPlannerView.swift */; };
+		770E272BF0BA47F9928FDD79 /* CreateTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53FB80B09F964253806F7E7F /* CreateTripView.swift */; };
+		CE494AEE46A145E1805B06FA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F6D965E01E4F18AAB2B81E /* SettingsView.swift */; };
+		A48A8400892F487EA212F934 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85757FE15CC84364BD3984CB /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		3ED21DB82A8B4DE6B9518391 /* EuVignette.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EuVignette.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAFE98C2653D4AB0AE618785 /* EuVignetteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EuVignetteApp.swift; sourceTree = "<group>"; };
+		8983D4B5C8234BD5BB5E1DFA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		CD24F9101C7E4926878C42D6 /* VignetteCountry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VignetteCountry.swift; sourceTree = "<group>"; };
+		6F12F0E158E0484F88AD5421 /* SavedVignette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedVignette.swift; sourceTree = "<group>"; };
+		E4EBDAC2CA5F496CA4444C8E /* TripPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripPlan.swift; sourceTree = "<group>"; };
+		E47D29C326144BEEB949317E /* CountryCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryCatalog.swift; sourceTree = "<group>"; };
+		C4947BC0CFF74A5CB6C33D96 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		55FB1D1367A741929D1951A2 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		90C40F0C11584042B8C9D48B /* CountryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryListView.swift; sourceTree = "<group>"; };
+		ECF23AEC1289433199B22FE0 /* CountryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryDetailView.swift; sourceTree = "<group>"; };
+		12C9143085C2456E976F8EAE /* MyVignettesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyVignettesView.swift; sourceTree = "<group>"; };
+		756C72AFFADB41D1B206E6B1 /* AddVignetteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddVignetteView.swift; sourceTree = "<group>"; };
+		DFF5FFE9E5934B7684BD3F6C /* TripPlannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripPlannerView.swift; sourceTree = "<group>"; };
+		53FB80B09F964253806F7E7F /* CreateTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTripView.swift; sourceTree = "<group>"; };
+		93F6D965E01E4F18AAB2B81E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		85757FE15CC84364BD3984CB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		78C9CE16DE3547368E4F98AB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		52E5925E1CC3466AB2D53DCF = {
+			isa = PBXGroup;
+			children = (
+				D672B0EC862B4159A835B806 /* EuVignette */,
+				6B296715BE7D4705A562333C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6B296715BE7D4705A562333C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3ED21DB82A8B4DE6B9518391 /* EuVignette.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D672B0EC862B4159A835B806 /* EuVignette */ = {
+			isa = PBXGroup;
+			children = (
+				AAFE98C2653D4AB0AE618785 /* EuVignetteApp.swift */,
+				8983D4B5C8234BD5BB5E1DFA /* ContentView.swift */,
+				26A85EDB966A47C19AEFAE86 /* Models */,
+				2D4921DDC2DC497281038D6F /* Data */,
+				5AA1BA90D4BF4FBD8A168EEE /* Services */,
+				1B1B2F01D82E49AFB56545DA /* Views */,
+				85757FE15CC84364BD3984CB /* Assets.xcassets */,
+			);
+			path = EuVignette;
+			sourceTree = "<group>";
+		};
+		26A85EDB966A47C19AEFAE86 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				CD24F9101C7E4926878C42D6 /* VignetteCountry.swift */,
+				6F12F0E158E0484F88AD5421 /* SavedVignette.swift */,
+				E4EBDAC2CA5F496CA4444C8E /* TripPlan.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		2D4921DDC2DC497281038D6F /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				E47D29C326144BEEB949317E /* CountryCatalog.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		5AA1BA90D4BF4FBD8A168EEE /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				C4947BC0CFF74A5CB6C33D96 /* NotificationManager.swift */,
+				55FB1D1367A741929D1951A2 /* UserSettings.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		1B1B2F01D82E49AFB56545DA /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A2F88BB209224E5B97B0BD86 /* Countries */,
+				1A1B04F650474BB8925B30CD /* Vignettes */,
+				E2BCA4712E234808B3B716C3 /* Trip */,
+				C6E9CE079C8E416CBD9433BF /* Settings */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A2F88BB209224E5B97B0BD86 /* Countries */ = {
+			isa = PBXGroup;
+			children = (
+				90C40F0C11584042B8C9D48B /* CountryListView.swift */,
+				ECF23AEC1289433199B22FE0 /* CountryDetailView.swift */,
+			);
+			path = Countries;
+			sourceTree = "<group>";
+		};
+		1A1B04F650474BB8925B30CD /* Vignettes */ = {
+			isa = PBXGroup;
+			children = (
+				12C9143085C2456E976F8EAE /* MyVignettesView.swift */,
+				756C72AFFADB41D1B206E6B1 /* AddVignetteView.swift */,
+			);
+			path = Vignettes;
+			sourceTree = "<group>";
+		};
+		E2BCA4712E234808B3B716C3 /* Trip */ = {
+			isa = PBXGroup;
+			children = (
+				DFF5FFE9E5934B7684BD3F6C /* TripPlannerView.swift */,
+				53FB80B09F964253806F7E7F /* CreateTripView.swift */,
+			);
+			path = Trip;
+			sourceTree = "<group>";
+		};
+		C6E9CE079C8E416CBD9433BF /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				93F6D965E01E4F18AAB2B81E /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D85B4FB4FEA143279DA2DB5B /* EuVignette */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B2039C787C14E5A8A836974 /* Build configuration list for PBXNativeTarget "EuVignette" */;
+			buildPhases = (
+				DAB2014C4ADE400A8E365206 /* Sources */,
+				78C9CE16DE3547368E4F98AB /* Frameworks */,
+				CA658AFE7BBC414A80F4CBBE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EuVignette;
+			productName = EuVignette;
+			productReference = 3ED21DB82A8B4DE6B9518391 /* EuVignette.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B20DB58FE3CD4331AD099D19 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					D85B4FB4FEA143279DA2DB5B = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = C0FA2603954F4241B51B9685 /* Build configuration list for PBXProject "EuVignette" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 52E5925E1CC3466AB2D53DCF;
+			productRefGroup = 6B296715BE7D4705A562333C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D85B4FB4FEA143279DA2DB5B /* EuVignette */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CA658AFE7BBC414A80F4CBBE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A48A8400892F487EA212F934 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DAB2014C4ADE400A8E365206 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E580AFD85D274CB5AFEF96C5 /* EuVignetteApp.swift in Sources */,
+				91D958614AE14A3F968B3716 /* ContentView.swift in Sources */,
+				326D66F60816409190564E4D /* VignetteCountry.swift in Sources */,
+				D5BDA80FD6354856A527ACF0 /* SavedVignette.swift in Sources */,
+				97BFA7F615A64DA08C99E435 /* TripPlan.swift in Sources */,
+				7953EADE708D4CE5AF6A93F4 /* CountryCatalog.swift in Sources */,
+				C1CD33656C3249BEBE8B91E8 /* NotificationManager.swift in Sources */,
+				0937309A85424E6FA774D5F6 /* UserSettings.swift in Sources */,
+				7C3EE93AB9DE428D84BBBEAE /* CountryListView.swift in Sources */,
+				0BF400BF29AA45A0A3487171 /* CountryDetailView.swift in Sources */,
+				0A3411261237400B9CF72DD6 /* MyVignettesView.swift in Sources */,
+				5D2FB701E177472ABF3D58C3 /* AddVignetteView.swift in Sources */,
+				F29F5B002A224D098D1EE3BA /* TripPlannerView.swift in Sources */,
+				770E272BF0BA47F9928FDD79 /* CreateTripView.swift in Sources */,
+				CE494AEE46A145E1805B06FA /* SettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1754A4B8644A4D2BAA035092 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		11FC0F3C17D449EAB5C88D02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C941B26630584FCE8D45BEA4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "EU Vignette";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
+				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "EU Vignette sends reminders before your motorway vignettes expire.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.euvignette.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C5E813FBAC0043279E08159A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "EU Vignette";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
+				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "EU Vignette sends reminders before your motorway vignettes expire.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.euvignette.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C0FA2603954F4241B51B9685 /* Build configuration list for PBXProject "EuVignette" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1754A4B8644A4D2BAA035092 /* Debug */,
+				11FC0F3C17D449EAB5C88D02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4B2039C787C14E5A8A836974 /* Build configuration list for PBXNativeTarget "EuVignette" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C941B26630584FCE8D45BEA4 /* Debug */,
+				C5E813FBAC0043279E08159A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B20DB58FE3CD4331AD099D19 /* Project object */;
+}
