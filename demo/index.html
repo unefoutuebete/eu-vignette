@@ -32,9 +32,10 @@
       flex-direction: column;
       -webkit-tap-highlight-color: transparent;
     }
-    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; padding-bottom: calc(64px + var(--safe-bottom)); }
     .screen.active { display: flex; }
     .screen-map {
+      padding-bottom: 0;
       height: calc(100dvh - 64px - var(--safe-bottom));
       max-height: calc(100dvh - 64px - var(--safe-bottom));
     }

@@ -39,7 +39,9 @@ cd eu-vignette
 
 Open the interactive browser demo on your phone or desktop — includes the map with timeline slider:
 
-**https://htmlpreview.github.io/?https://raw.githubusercontent.com/unefoutuebete/eu-vignette/cursor/map-timeline-f827/demo/index.html**
+**https://raw.githack.com/unefoutuebete/eu-vignette/cursor/map-timeline-f827/demo/index.html**
+
+Alternative: [htmlpreview](https://htmlpreview.github.io/?https://raw.githubusercontent.com/unefoutuebete/eu-vignette/cursor/map-timeline-f827/demo/index.html)
 
 2. Open the Xcode project:
 
