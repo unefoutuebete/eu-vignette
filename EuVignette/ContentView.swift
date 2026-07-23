@@ -3,6 +3,11 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         TabView {
+            MapTimelineView()
+                .tabItem {
+                    Label("Map", systemImage: "map.fill")
+                }
+
             CountryListView()
                 .tabItem {
                     Label("Countries", systemImage: "globe.europe.africa")
