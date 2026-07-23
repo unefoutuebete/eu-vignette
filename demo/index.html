@@ -6,12 +6,14 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>EU Vignette — Demo</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <style>
     :root {
       --blue: #2566e6;
-      --green: #34c759;
+      --green: #33c759;
+      --yellow: #ffcc00;
       --red: #ff3b30;
-      --orange: #ff9500;
+      --gray: #aeaeb2;
       --bg: #f2f2f7;
       --card: #ffffff;
       --text: #1c1c1e;
@@ -31,18 +33,21 @@
       flex-direction: column;
       -webkit-tap-highlight-color: transparent;
     }
-    .screen { display: none; flex: 1; flex-direction: column; padding-bottom: calc(72px + var(--safe-bottom)); }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; padding-bottom: calc(64px + var(--safe-bottom)); }
     .screen.active { display: flex; }
+    .screen-map { padding-bottom: calc(64px + var(--safe-bottom)); }
     .nav {
       background: rgba(242,242,247,0.92);
       backdrop-filter: blur(20px);
       padding: 12px 16px 8px;
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 1000;
       border-bottom: 0.5px solid var(--separator);
+      flex-shrink: 0;
     }
     .nav h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.4px; }
+    .nav.compact h1 { font-size: 17px; font-weight: 600; text-align: center; }
     .nav-row { display: flex; align-items: center; gap: 8px; }
     .nav-row h1 { font-size: 17px; font-weight: 600; flex: 1; text-align: center; }
     .back-btn {
@@ -80,9 +85,7 @@
       text-transform: uppercase; padding: 20px 16px 8px; letter-spacing: 0.2px;
     }
     .price { color: var(--blue); font-weight: 600; font-size: 15px; }
-    .badge {
-      font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 999px;
-    }
+    .badge { font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 999px; }
     .badge-green { background: rgba(52,199,89,0.15); color: #248a3d; }
     .badge-orange { background: rgba(255,149,0,0.15); color: #c93400; }
     .badge-red { background: rgba(255,59,48,0.15); color: var(--red); }
@@ -95,11 +98,6 @@
     }
     .btn-link:active { background: #f0f0f5; }
     .tip { display: flex; gap: 8px; padding: 10px 16px; font-size: 15px; align-items: flex-start; }
-    .empty {
-      text-align: center; padding: 60px 32px; color: var(--secondary);
-    }
-    .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
-    .empty h2 { font-size: 20px; color: var(--text); margin-bottom: 8px; font-weight: 600; }
     .tabs {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 430px;
@@ -108,38 +106,130 @@
       border-top: 0.5px solid var(--separator);
       display: flex;
       padding-bottom: var(--safe-bottom);
+      z-index: 2000;
     }
     .tab {
       flex: 1; border: none; background: none;
       padding: 6px 0 4px; cursor: pointer;
-      color: var(--secondary); font-size: 10px;
+      color: var(--secondary); font-size: 9px;
       display: flex; flex-direction: column; align-items: center; gap: 2px;
     }
     .tab.active { color: var(--blue); }
-    .tab-icon { font-size: 22px; line-height: 1; }
+    .tab-icon { font-size: 20px; line-height: 1; }
     .hero { padding: 16px; display: flex; gap: 16px; align-items: flex-start; }
     .hero .flag { font-size: 56px; }
     .hero h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
     .hero p { font-size: 15px; color: var(--secondary); line-height: 1.4; }
-    .banner {
-      background: #fff8e6; border: 1px solid #ffe08a;
-      margin: 12px 16px 0; padding: 12px 14px; border-radius: 10px;
-      font-size: 14px; line-height: 1.4; color: #7a5c00;
+
+    /* Map screen */
+    .map-wrap { flex: 1; position: relative; min-height: 320px; }
+    #map { width: 100%; height: 100%; min-height: 320px; z-index: 1; }
+    .map-overlay {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 500;
+      pointer-events: none;
+    }
+    .map-overlay > * { pointer-events: auto; }
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 6px 10px;
+      margin: 8px 12px 0; padding: 8px 10px;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+      border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      font-size: 10px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .timeline-panel {
+      margin: 8px 12px 10px; padding: 14px;
+      background: rgba(255,255,255,0.94); backdrop-filter: blur(12px);
+      border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    }
+    .timeline-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .timeline-date { font-size: 16px; font-weight: 600; }
+    .today-pill {
+      font-size: 11px; font-weight: 600; color: var(--blue);
+      background: rgba(37,102,230,0.12); padding: 3px 8px; border-radius: 999px;
+    }
+    .timeline-slider {
+      width: 100%; height: 4px; -webkit-appearance: none; appearance: none;
+      background: #ddd; border-radius: 2px; outline: none;
+    }
+    .timeline-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%;
+      background: var(--blue); box-shadow: 0 1px 4px rgba(0,0,0,0.25); cursor: pointer;
+    }
+    .timeline-slider::-moz-range-thumb {
+      width: 24px; height: 24px; border-radius: 50%; border: none;
+      background: var(--blue); box-shadow: 0 1px 4px rgba(0,0,0,0.25); cursor: pointer;
+    }
+    .timeline-range { display: flex; justify-content: space-between; font-size: 11px; color: var(--secondary); margin-top: 6px; }
+
+    /* Country popup sheet */
+    .sheet-backdrop {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+      z-index: 3000; align-items: flex-end; justify-content: center;
+    }
+    .sheet-backdrop.open { display: flex; }
+    .sheet {
+      width: 100%; max-width: 430px; max-height: 55vh;
+      background: var(--bg); border-radius: 16px 16px 0 0;
+      overflow-y: auto; padding-bottom: calc(16px + var(--safe-bottom));
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-handle { width: 36px; height: 4px; background: #ccc; border-radius: 2px; margin: 8px auto 0; }
+    .sheet-header { padding: 12px 16px 8px; display: flex; align-items: center; gap: 12px; }
+    .sheet-header h2 { font-size: 20px; font-weight: 700; }
+    .status-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px; margin: 0 16px 12px;
+      background: var(--card); border-radius: 12px;
+    }
+    .status-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .status-text { font-size: 15px; font-weight: 600; }
+    .status-sub { font-size: 13px; color: var(--secondary); margin-top: 2px; }
+    .sheet-btn {
+      display: block; margin: 0 16px; padding: 14px;
+      background: var(--blue); color: white; text-align: center;
+      border: none; border-radius: 12px; font-size: 16px; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+    }
+    .sheet-close {
+      margin: 12px 16px 0; padding: 12px; width: calc(100% - 32px);
+      background: none; border: none; color: var(--blue); font-size: 16px; cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="banner">📱 Interactive demo — open on your phone. Native app requires Xcode on a Mac to install.</div>
+
+  <!-- MAP -->
+  <div id="screen-map" class="screen screen-map active">
+    <div class="nav compact"><h1>Map</h1></div>
+    <div class="map-wrap">
+      <div id="map"></div>
+      <div class="map-overlay">
+        <div class="legend" id="legend"></div>
+        <div class="timeline-panel">
+          <div class="timeline-header">
+            <span class="timeline-date" id="timeline-date"></span>
+            <span class="today-pill" id="today-pill" style="display:none">Today</span>
+          </div>
+          <input type="range" class="timeline-slider" id="timeline-slider" min="0" max="365" value="0" step="1">
+          <div class="timeline-range">
+            <span id="range-start"></span>
+            <span id="range-end"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Countries -->
-  <div id="screen-countries" class="screen active">
+  <div id="screen-countries" class="screen">
     <div class="nav">
       <h1>Countries</h1>
       <input class="search" placeholder="Search countries" oninput="filterCountries(this.value)">
     </div>
-    <div class="content">
-      <div class="list" id="country-list"></div>
-    </div>
+    <div class="content"><div class="list" id="country-list"></div></div>
   </div>
 
   <!-- Country Detail -->
@@ -163,28 +253,7 @@
       </div>
     </div>
     <div class="content">
-      <div class="list">
-        <div class="row" style="flex-direction:column;align-items:stretch;cursor:default">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="flag-sm">🇦🇹</span>
-            <span class="row-title">Austria</span>
-            <span style="flex:1"></span>
-            <span class="badge badge-green">7 days left</span>
-          </div>
-          <div class="plate">W-1234AB</div>
-          <div class="meta"><span>🕐 10 days</span><span>Expires Aug 1, 2026</span></div>
-        </div>
-        <div class="row" style="flex-direction:column;align-items:stretch;cursor:default">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="flag-sm">🇨🇭</span>
-            <span class="row-title">Switzerland</span>
-            <span style="flex:1"></span>
-            <span class="badge badge-orange">Expires today</span>
-          </div>
-          <div class="plate">ZH-567890</div>
-          <div class="meta"><span>🕐 1 year</span><span>Expires Jul 23, 2026</span></div>
-        </div>
-      </div>
+      <div class="list" id="vignette-list"></div>
     </div>
   </div>
 
@@ -231,82 +300,295 @@
           </div>
         </div>
       </div>
-      <div class="section-label">Notifications</div>
-      <div class="list list-flush">
-        <div class="row" style="cursor:default;justify-content:space-between">
-          <span>Expiry reminders</span>
-          <span style="color:var(--green);font-weight:600">On</span>
-        </div>
-        <div class="row" style="cursor:default;justify-content:space-between">
-          <span>Permission status</span>
-          <span class="row-sub">Allowed</span>
-        </div>
-      </div>
       <div class="section-label">About</div>
       <div class="list list-flush">
         <div class="row" style="cursor:default;justify-content:space-between">
-          <span>Version</span>
-          <span class="row-sub">1.0.0</span>
+          <span>Version</span><span class="row-sub">1.0.0 (HTML preview)</span>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Map country sheet -->
+  <div class="sheet-backdrop" id="sheet-backdrop" onclick="closeSheet(event)">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <span class="flag-sm" id="sheet-flag"></span>
+        <div>
+          <h2 id="sheet-name"></h2>
+          <div class="row-sub" id="sheet-date-label"></div>
+        </div>
+      </div>
+      <div class="status-row">
+        <div class="status-dot" id="sheet-status-dot"></div>
+        <div>
+          <div class="status-text" id="sheet-status-label"></div>
+          <div class="status-sub" id="sheet-status-sub"></div>
+        </div>
+      </div>
+      <div id="sheet-plate-row" style="display:none;padding:0 16px 12px">
+        <div class="row-sub">License plate</div>
+        <div class="plate" id="sheet-plate"></div>
+      </div>
+      <a class="sheet-btn" id="sheet-buy-btn" href="#" target="_blank" rel="noopener" style="display:none">Buy on official portal</a>
+      <button class="sheet-close" onclick="closeSheet()">Done</button>
+    </div>
+  </div>
+
   <nav class="tabs">
-    <button class="tab active" data-tab="countries" onclick="switchTab('countries')">
+    <button class="tab active" data-tab="map" onclick="switchTab('map')">
+      <span class="tab-icon">🗺️</span>Map
+    </button>
+    <button class="tab" data-tab="countries" onclick="switchTab('countries')">
       <span class="tab-icon">🌍</span>Countries
     </button>
     <button class="tab" data-tab="vignettes" onclick="switchTab('vignettes')">
       <span class="tab-icon">🚗</span>Vignettes
     </button>
     <button class="tab" data-tab="trips" onclick="switchTab('trips')">
-      <span class="tab-icon">🗺️</span>Trips
+      <span class="tab-icon">📋</span>Trips
     </button>
     <button class="tab" data-tab="settings" onclick="switchTab('settings')">
       <span class="tab-icon">⚙️</span>Settings
     </button>
   </nav>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
+    const STATUS = {
+      valid:       { label: 'Valid vignette',            color: '#33c759' },
+      expiringSoon:{ label: 'Expiring within 30 days',   color: '#ffcc00' },
+      missing:     { label: 'Vignette required',         color: '#ff3b30' },
+      notRequired: { label: 'No vignette required',      color: '#aeaeb2' }
+    };
+
+    const VIGNETTE_IDS = new Set(['AT','CH','SI','HU','CZ','SK','RO','BG','MD']);
+
     const countries = [
       { id:"AT", name:"Austria", flag:"🇦🇹", summary:"Digital or physical vignette required on all Austrian motorways and expressways.",
         options:[["1 day","€8.60"],["10 days","€11.50"],["2 months","€28.90"],["1 year","€96.40"]],
-        tips:["Buy only from the official ASFINAG shop.","Register your license plate correctly.","Section tolls are billed separately."],
+        tips:["Buy only from the official ASFINAG shop.","Register your license plate correctly."],
         url:"https://shop.asfinag.at/en/" },
       { id:"CH", name:"Switzerland", flag:"🇨🇭", summary:"Annual vignette linked to your license plate required on Swiss motorways.",
-        options:[["1 year","CHF 40"]],
-        tips:["Purchase from via.admin.ch.","Digital vignette is tied to your plate."],
-        url:"https://via.admin.ch/shop/" },
+        options:[["1 year","CHF 40"]], tips:["Purchase from via.admin.ch."], url:"https://via.admin.ch/shop/" },
       { id:"SI", name:"Slovenia", flag:"🇸🇮", summary:"E-vignette registered to your license plate required on motorways.",
-        options:[["7 days","€16.00"],["1 month","€32.00"],["1 year","€117.50"]],
-        tips:["Set start date before entering motorways."],
-        url:"https://evinjeta.dars.si/en" },
+        options:[["7 days","€16.00"],["1 month","€32.00"],["1 year","€117.50"]], tips:["Set start date before entering motorways."], url:"https://evinjeta.dars.si/en" },
       { id:"HU", name:"Hungary", flag:"🇭🇺", summary:"E-matrica system — purchase and register your plate before toll roads.",
-        options:[["10 days","HUF 6,400"],["1 month","HUF 10,360"],["1 year","HUF 57,600"]],
-        tips:["County and motorway vignettes differ."],
-        url:"https://ematrica.nemzetiutdij.hu/en/" },
+        options:[["10 days","HUF 6,400"],["1 month","HUF 10,360"],["1 year","HUF 57,600"]], tips:["County and motorway vignettes differ."], url:"https://ematrica.nemzetiutdij.hu/en/" },
       { id:"CZ", name:"Czech Republic", flag:"🇨🇿", summary:"Motorway vignette linked to your license plate is mandatory.",
-        options:[["1 day","CZK 200"],["10 days","CZK 270"],["1 month","CZK 430"],["1 year","CZK 2,440"]],
-        tips:["Set start date before entering motorways."],
-        url:"https://edalnice.cz/en/index.html" },
+        options:[["1 day","CZK 200"],["10 days","CZK 270"],["1 month","CZK 430"],["1 year","CZK 2,440"]], tips:["Set the vignette start date before entering motorways."], url:"https://edalnice.cz/en/index.html" },
       { id:"SK", name:"Slovakia", flag:"🇸🇰", summary:"Electronic vignette registered to your license plate required.",
-        options:[["1 day","€8.10"],["10 days","€10.80"],["1 month","€17.10"],["1 year","€90.00"]],
-        tips:["Verify plate country code during checkout."],
-        url:"https://eznamka.sk/en/" },
+        options:[["1 day","€8.10"],["10 days","€10.80"],["1 month","€17.10"],["1 year","€90.00"]], tips:["Verify plate country code during checkout."], url:"https://eznamka.sk/en/" },
       { id:"RO", name:"Romania", flag:"🇷🇴", summary:"Rovinieta electronic toll system tied to vehicle registration.",
-        options:[["7 days","RON varies"],["30 days","RON varies"],["1 year","RON varies"]],
-        tips:["Tariffs depend on vehicle category."],
-        url:"https://www.roviniete.ro/en/" },
+        options:[["7 days","RON varies"],["30 days","RON varies"],["1 year","RON varies"]], tips:["Tariffs depend on vehicle category."], url:"https://www.roviniete.ro/en/" },
       { id:"BG", name:"Bulgaria", flag:"🇧🇬", summary:"E-vignette linked to your license plate required on motorways.",
-        options:[["7 days","BGN varies"],["1 month","BGN varies"],["1 year","BGN varies"]],
-        tips:["Activate before entering tolled sections."],
-        url:"https://www.bgtoll.bg/en" },
+        options:[["7 days","BGN varies"],["1 month","BGN varies"],["1 year","BGN varies"]], tips:["Activate before entering tolled sections."], url:"https://www.bgtoll.bg/en" },
       { id:"MD", name:"Moldova", flag:"🇲🇩", summary:"Electronic road vignette for designated national road networks.",
-        options:[["7 days","MDL varies"],["15 days","MDL varies"],["30 days","MDL varies"]],
-        tips:["Confirm route coverage before purchase."],
-        url:"https://vinieta.gov.md/en/" }
+        options:[["7 days","MDL varies"],["15 days","MDL varies"],["30 days","MDL varies"]], tips:["Confirm route coverage before purchase."], url:"https://vinieta.gov.md/en/" }
     ];
 
+    // Simplified polygons [lat, lng] — mirrors iOS EuropeBoundaries.swift
+    const boundaries = [
+      { id:"AT", name:"Austria", requiresVignette:true, coords:[[47.27,9.53],[47.59,12],[48.77,13.02],[48.98,14.5],[48.72,16.95],[48.12,17.16],[47.06,16.95],[46.62,16.2],[46.4,14.98],[46.51,13.7],[46.61,12.38],[47.05,10.55]] },
+      { id:"CH", name:"Switzerland", requiresVignette:true, coords:[[47.81,7.59],[47.53,8.52],[47.27,9.53],[47.05,10.55],[46.8,10.4],[46.2,8.96],[45.92,7.05],[46.15,6.14],[46.78,6.02],[47.48,6.75]] },
+      { id:"SI", name:"Slovenia", requiresVignette:true, coords:[[46.55,13.7],[46.4,14.98],[46.62,16.2],[46.87,16.6],[46.55,16.52],[45.78,15.65],[45.42,15.2],[45.47,14.11],[45.6,13.7],[46,13.38]] },
+      { id:"HU", name:"Hungary", requiresVignette:true, coords:[[48.58,22.9],[48.58,16.11],[47.77,16.58],[46.72,16.58],[46.07,18.83],[45.75,20.25],[46.22,21.03],[46.37,22.9],[47.95,22.9]] },
+      { id:"CZ", name:"Czech Republic", requiresVignette:true, coords:[[50.08,12.1],[50.77,14.8],[51.05,15.02],[50.98,16.85],[50.35,18.85],[49.58,18.85],[48.98,17.16],[48.58,16.95],[48.63,6.87]] },
+      { id:"SK", name:"Slovakia", requiresVignette:true, coords:[[49.58,18.85],[50.35,18.85],[50.98,16.85],[51.05,15.02],[50.77,14.8],[50.08,12.1],[48.63,6.87],[48.58,16.95],[48.98,17.16]] },
+      { id:"RO", name:"Romania", requiresVignette:true, coords:[[48.22,20.22],[47.97,22.87],[47.66,25],[46.2,28.2],[44.95,28.6],[43.68,28.05],[43.62,27.5],[44.2,22.7],[45.42,20.22],[46.2,21],[47.06,16.95],[48.12,17.16]] },
+      { id:"BG", name:"Bulgaria", requiresVignette:true, coords:[[44.2,22.7],[43.62,27.5],[43.68,28.05],[42,27.9],[41.24,26.1],[41.98,22.5],[43.68,22.4]] },
+      { id:"MD", name:"Moldova", requiresVignette:true, coords:[[48.49,26.62],[48.22,27.65],[47.97,28.9],[46.2,28.2],[47.66,25],[47.97,22.87]] },
+      { id:"DE", name:"Germany", requiresVignette:false, coords:[[55.06,8.5],[54.8,13.8],[53.55,14.7],[51.27,15.02],[50.08,12.1],[48.63,6.87],[47.81,7.59],[47.05,10.55],[47.59,12],[50.08,12.1],[51.27,15.02],[50.98,16.85],[50.35,18.85],[49.58,18.85],[48.98,17.16],[48.58,16.95]] },
+      { id:"PL", name:"Poland", requiresVignette:false, coords:[[54.8,14.2],[54.35,19.4],[52.35,23.5],[49,24],[49.58,18.85],[50.98,16.85],[51.27,15.02],[53.55,14.7]] },
+      { id:"IT", name:"Italy", requiresVignette:false, coords:[[46.8,10.4],[46.2,8.96],[45.92,7.05],[44.2,7.05],[43.78,7.52],[43.6,10.5],[44.1,12.4],[45.47,13.7],[45.42,15.2],[45.78,15.65],[46.55,16.52],[46.87,16.6],[46.62,16.2],[46.4,14.98],[46.55,13.7],[46,13.38],[45.6,13.7]] },
+      { id:"FR", name:"France", requiresVignette:false, coords:[[47.48,6.75],[46.78,6.02],[46.15,6.14],[45.92,7.05],[44.2,7.05],[43.78,7.52],[43.6,10.5],[44.1,12.4],[43.5,3.5],[42.35,3.05],[43.4,-1.8],[46.2,-1.3],[48.85,-4.8],[49.7,1.6],[50.95,1.8],[51.05,2.55],[50.95,4.4],[50.08,4.7],[49.55,6.2]] },
+      { id:"HR", name:"Croatia", requiresVignette:false, coords:[[46.55,13.7],[46,13.38],[45.6,13.7],[45.47,13.7],[44.1,12.4],[43.6,10.5],[43.78,7.52],[44.2,7.05],[45.42,15.2],[45.78,15.65],[46.55,16.52]] },
+      { id:"RS", name:"Serbia", requiresVignette:false, coords:[[46.2,21],[45.42,20.22],[44.2,22.7],[43.68,22.4],[41.98,22.5],[42.25,20.3],[43.2,19],[44.8,19]] },
+      { id:"UA", name:"Ukraine", requiresVignette:false, coords:[[48.49,26.62],[48.22,27.65],[47.97,28.9],[46.2,28.2],[47.66,25],[47.97,22.87],[48.22,20.22],[48.12,17.16],[48.58,16.95],[49.58,18.85],[49,24],[52.35,23.5],[54.8,14.2],[55.06,8.5],[52.35,23.5],[50.35,24]] }
+    ];
+
+    function startOfDay(d) {
+      const x = new Date(d);
+      x.setHours(0, 0, 0, 0);
+      return x;
+    }
+
+    function addDays(d, n) {
+      const x = new Date(d);
+      x.setDate(x.getDate() + n);
+      return startOfDay(x);
+    }
+
+    function daysBetween(a, b) {
+      return Math.round((startOfDay(b) - startOfDay(a)) / 86400000);
+    }
+
+    function fmtDate(d) {
+      return d.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function fmtShort(d) {
+      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    // Demo vignettes — relative to today so preview always works
+    const today = startOfDay(new Date());
+    const timelineEnd = addDays(today, 365);
+    const totalDays = daysBetween(today, timelineEnd);
+
+    const demoVignettes = [
+      { countryID: 'AT', plate: 'W-1234AB', duration: '10 days', purchase: addDays(today, -10), expiry: addDays(today, 7) },
+      { countryID: 'CH', plate: 'ZH-567890', duration: '1 year', purchase: addDays(today, -300), expiry: today }
+    ];
+
+    function getStatus(countryID, date) {
+      if (!VIGNETTE_IDS.has(countryID)) return 'notRequired';
+      const day = startOfDay(date);
+      const valid = demoVignettes.filter(v =>
+        v.countryID === countryID && v.purchase <= day && day <= v.expiry
+      );
+      if (!valid.length) return 'missing';
+      const best = valid.reduce((a, b) => a.expiry > b.expiry ? a : b);
+      const daysLeft = daysBetween(day, best.expiry);
+      return daysLeft <= 30 ? 'expiringSoon' : 'valid';
+    }
+
+    function statusSummary(countryID, date) {
+      const s = getStatus(countryID, date);
+      if (s === 'notRequired') return 'No motorway vignette required';
+      if (s === 'missing') return 'No valid vignette — purchase required';
+      const v = demoVignettes.find(x => x.countryID === countryID && x.purchase <= date && date <= x.expiry);
+      if (!v) return STATUS[s].label;
+      const daysLeft = daysBetween(date, v.expiry);
+      if (s === 'expiringSoon') return `Expires in ${daysLeft} day(s)`;
+      return `Valid until ${fmtShort(v.expiry)}`;
+    }
+
+    function activeVignette(countryID, date) {
+      const day = startOfDay(date);
+      return demoVignettes.find(v => v.countryID === countryID && v.purchase <= day && day <= v.expiry);
+    }
+
+    // --- Map ---
+    let map, polygonLayers = {};
+    let selectedDayOffset = 0;
+
+    function initMap() {
+      map = L.map('map', { zoomControl: false, attributionControl: false })
+        .setView([48.5, 17.5], 5);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 12
+      }).addTo(map);
+
+      // Draw gray countries first, vignette countries on top
+      [...boundaries.filter(b => !b.requiresVignette), ...boundaries.filter(b => b.requiresVignette)]
+        .forEach(b => {
+          const layer = L.polygon(b.coords, { weight: 1.5, fillOpacity: 0.55 })
+            .addTo(map)
+            .on('click', () => openSheet(b.id));
+          polygonLayers[b.id] = layer;
+        });
+
+      updateMapColors();
+      setTimeout(() => map.invalidateSize(), 100);
+    }
+
+    function updateMapColors() {
+      const date = addDays(today, selectedDayOffset);
+      Object.entries(polygonLayers).forEach(([id, layer]) => {
+        const s = getStatus(id, date);
+        const color = STATUS[s].color;
+        const opacity = s === 'notRequired' ? 0.35 : 0.62;
+        layer.setStyle({ color, fillColor: color, fillOpacity: opacity, weight: s === 'notRequired' ? 1 : 1.5 });
+      });
+      document.getElementById('timeline-date').textContent = fmtDate(date);
+      document.getElementById('today-pill').style.display = selectedDayOffset === 0 ? 'inline' : 'none';
+    }
+
+    function initTimeline() {
+      const slider = document.getElementById('timeline-slider');
+      slider.max = totalDays;
+      document.getElementById('range-start').textContent = fmtShort(today);
+      document.getElementById('range-end').textContent = fmtShort(timelineEnd);
+      document.getElementById('timeline-date').textContent = fmtDate(today);
+
+      slider.addEventListener('input', () => {
+        selectedDayOffset = parseInt(slider.value, 10);
+        updateMapColors();
+      });
+    }
+
+    function initLegend() {
+      document.getElementById('legend').innerHTML = Object.entries(STATUS).map(([k, v]) =>
+        `<span class="legend-item"><span class="legend-dot" style="background:${v.color}"></span>${v.label}</span>`
+      ).join('');
+    }
+
+    function openSheet(countryID) {
+      const date = addDays(today, selectedDayOffset);
+      const b = boundaries.find(x => x.id === countryID);
+      const c = countries.find(x => x.id === countryID);
+      const s = getStatus(countryID, date);
+      const st = STATUS[s];
+
+      document.getElementById('sheet-flag').textContent = c ? c.flag : '';
+      document.getElementById('sheet-name').textContent = b.name;
+      document.getElementById('sheet-date-label').textContent = 'On ' + fmtShort(date);
+      document.getElementById('sheet-status-dot').style.background = st.color;
+      document.getElementById('sheet-status-label').textContent = st.label;
+      document.getElementById('sheet-status-sub').textContent = statusSummary(countryID, date);
+
+      const v = activeVignette(countryID, date);
+      const plateRow = document.getElementById('sheet-plate-row');
+      if (v) {
+        plateRow.style.display = 'block';
+        document.getElementById('sheet-plate').textContent = v.plate;
+      } else {
+        plateRow.style.display = 'none';
+      }
+
+      const buyBtn = document.getElementById('sheet-buy-btn');
+      if (c && VIGNETTE_IDS.has(countryID)) {
+        buyBtn.style.display = 'block';
+        buyBtn.href = c.url;
+      } else {
+        buyBtn.style.display = 'none';
+      }
+
+      document.getElementById('sheet-backdrop').classList.add('open');
+    }
+
+    function closeSheet(e) {
+      if (e && e.target !== document.getElementById('sheet-backdrop')) return;
+      document.getElementById('sheet-backdrop').classList.remove('open');
+    }
+
+    // --- Vignette list ---
+    function renderVignettes() {
+      document.getElementById('vignette-list').innerHTML = demoVignettes.map(v => {
+        const daysLeft = daysBetween(today, v.expiry);
+        const c = countries.find(x => x.id === v.countryID);
+        let badge, badgeClass;
+        if (daysLeft < 0) { badge = 'Expired'; badgeClass = 'badge-red'; }
+        else if (daysLeft === 0) { badge = 'Expires today'; badgeClass = 'badge-orange'; }
+        else if (daysLeft <= 30) { badge = `${daysLeft} days left`; badgeClass = 'badge-orange'; }
+        else { badge = `${daysLeft} days left`; badgeClass = 'badge-green'; }
+        return `<div class="row" style="flex-direction:column;align-items:stretch;cursor:default">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="flag-sm">${c.flag}</span>
+            <span class="row-title">${c.name}</span>
+            <span style="flex:1"></span>
+            <span class="badge ${badgeClass}">${badge}</span>
+          </div>
+          <div class="plate">${v.plate}</div>
+          <div class="meta"><span>🕐 ${v.duration}</span><span>Expires ${fmtShort(v.expiry)}</span></div>
+        </div>`;
+      }).join('');
+    }
+
+    // --- Countries tab ---
     function renderCountries(list) {
       document.getElementById('country-list').innerHTML = list.map(c => `
         <div class="row" onclick="openCountry('${c.id}')">
@@ -339,8 +621,7 @@
             <span class="price">${p}</span>
           </div>`).join('')}</div>
         <div class="section-label">Travel tips</div>
-        <div class="list list-flush">${c.tips.map(t => `
-          <div class="tip">💡 <span>${t}</span></div>`).join('')}</div>
+        <div class="list list-flush">${c.tips.map(t => `<div class="tip">💡 <span>${t}</span></div>`).join('')}</div>
         <div class="section-label">Official links</div>
         <div class="list list-flush">
           <button class="btn-link" onclick="window.open('${c.url}','_blank')">🛒 Buy on official portal</button>
@@ -351,9 +632,8 @@
     function showScreen(name) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById('screen-' + name).classList.add('active');
-      if (name === 'detail') {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      }
+      if (name === 'detail') document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      if (name === 'map') setTimeout(() => map && map.invalidateSize(), 150);
     }
 
     function switchTab(tab) {
@@ -361,7 +641,12 @@
       showScreen(tab);
     }
 
+    // Init
+    initLegend();
+    initTimeline();
     renderCountries(countries);
+    renderVignettes();
+    initMap();
   </script>
 </body>
 </html>

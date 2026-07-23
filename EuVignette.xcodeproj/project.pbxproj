@@ -23,6 +23,12 @@
 		770E272BF0BA47F9928FDD79 /* CreateTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53FB80B09F964253806F7E7F /* CreateTripView.swift */; };
 		CE494AEE46A145E1805B06FA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F6D965E01E4F18AAB2B81E /* SettingsView.swift */; };
 		A48A8400892F487EA212F934 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85757FE15CC84364BD3984CB /* Assets.xcassets */; };
+		2565FAD00A7949F2B31B3112 /* MapTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB3E17B9CB64643972F960C /* MapTimelineView.swift */; };
+		EA5092E6DDAC4D5A9FC12AD0 /* MapLegendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7542AACEC364018BA0C0E29 /* MapLegendView.swift */; };
+		87007966053B4A67AA885794 /* TimelineSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721BF1E9C83446D89A96AC7F /* TimelineSliderView.swift */; };
+		5AC709202F07446FAB98B1A9 /* VignetteMapStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = B974C47D985646979FEFF979 /* VignetteMapStatus.swift */; };
+		095AAFC2A48749A586CFB761 /* EuropeBoundaries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41EF0CCA655E4FB7AD12EEB1 /* EuropeBoundaries.swift */; };
+		DDAE8A706D3542FEAF40AA00 /* VignetteStatusService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8F2BE25DBA4BBD90E81809 /* VignetteStatusService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +49,12 @@
 		53FB80B09F964253806F7E7F /* CreateTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTripView.swift; sourceTree = "<group>"; };
 		93F6D965E01E4F18AAB2B81E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		85757FE15CC84364BD3984CB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DCB3E17B9CB64643972F960C /* MapTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapTimelineView.swift; sourceTree = "<group>"; };
+		D7542AACEC364018BA0C0E29 /* MapLegendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapLegendView.swift; sourceTree = "<group>"; };
+		721BF1E9C83446D89A96AC7F /* TimelineSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSliderView.swift; sourceTree = "<group>"; };
+		B974C47D985646979FEFF979 /* VignetteMapStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VignetteMapStatus.swift; sourceTree = "<group>"; };
+		41EF0CCA655E4FB7AD12EEB1 /* EuropeBoundaries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EuropeBoundaries.swift; sourceTree = "<group>"; };
+		0D8F2BE25DBA4BBD90E81809 /* VignetteStatusService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VignetteStatusService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +101,7 @@
 		26A85EDB966A47C19AEFAE86 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				B974C47D985646979FEFF979 /* VignetteMapStatus.swift */,
 				CD24F9101C7E4926878C42D6 /* VignetteCountry.swift */,
 				6F12F0E158E0484F88AD5421 /* SavedVignette.swift */,
 				E4EBDAC2CA5F496CA4444C8E /* TripPlan.swift */,
@@ -99,6 +112,7 @@
 		2D4921DDC2DC497281038D6F /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				41EF0CCA655E4FB7AD12EEB1 /* EuropeBoundaries.swift */,
 				E47D29C326144BEEB949317E /* CountryCatalog.swift */,
 			);
 			path = Data;
@@ -107,6 +121,7 @@
 		5AA1BA90D4BF4FBD8A168EEE /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				0D8F2BE25DBA4BBD90E81809 /* VignetteStatusService.swift */,
 				C4947BC0CFF74A5CB6C33D96 /* NotificationManager.swift */,
 				55FB1D1367A741929D1951A2 /* UserSettings.swift */,
 			);
@@ -116,6 +131,7 @@
 		1B1B2F01D82E49AFB56545DA /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				DCF47D7432B548898ECDFC6D /* Map */,
 				A2F88BB209224E5B97B0BD86 /* Countries */,
 				1A1B04F650474BB8925B30CD /* Vignettes */,
 				E2BCA4712E234808B3B716C3 /* Trip */,
@@ -157,6 +173,16 @@
 				93F6D965E01E4F18AAB2B81E /* SettingsView.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		DCF47D7432B548898ECDFC6D /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				DCB3E17B9CB64643972F960C /* MapTimelineView.swift */,
+				D7542AACEC364018BA0C0E29 /* MapLegendView.swift */,
+				721BF1E9C83446D89A96AC7F /* TimelineSliderView.swift */,
+			);
+			path = Map;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -243,6 +269,12 @@
 				F29F5B002A224D098D1EE3BA /* TripPlannerView.swift in Sources */,
 				770E272BF0BA47F9928FDD79 /* CreateTripView.swift in Sources */,
 				CE494AEE46A145E1805B06FA /* SettingsView.swift in Sources */,
+				2565FAD00A7949F2B31B3112 /* MapTimelineView.swift in Sources */,
+				EA5092E6DDAC4D5A9FC12AD0 /* MapLegendView.swift in Sources */,
+				87007966053B4A67AA885794 /* TimelineSliderView.swift in Sources */,
+				5AC709202F07446FAB98B1A9 /* VignetteMapStatus.swift in Sources */,
+				095AAFC2A48749A586CFB761 /* EuropeBoundaries.swift in Sources */,
+				DDAE8A706D3542FEAF40AA00 /* VignetteStatusService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

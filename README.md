@@ -4,10 +4,20 @@ An iOS app for planning European motorway travel, tracking digital vignettes, an
 
 ## Features
 
+- **Map** — Interactive Europe map with a 12-month timeline slider; countries color-coded by vignette status on any selected date
 - **Countries** — Browse 9 vignette-required countries (Austria, Switzerland, Slovenia, Hungary, Czech Republic, Slovakia, Romania, Bulgaria, Moldova) with pricing, tips, and official shop links
 - **My Vignettes** — Track purchased vignettes by license plate with expiry dates and status
 - **Trip Planner** — Select countries on your route and see which vignettes you need
 - **Expiry Reminders** — Local notifications before vignettes expire
+
+### Map color legend
+
+| Color | Meaning |
+|-------|---------|
+| Green | Valid vignette on the selected date |
+| Yellow | Vignette valid but expiring within 30 days |
+| Red | Vignette required but none valid |
+| Gray | No motorway vignette required |
 - **Settings** — Save a default license plate and manage notification preferences
 
 ## Requirements
@@ -24,6 +34,12 @@ An iOS app for planning European motorway travel, tracking digital vignettes, an
 git clone https://github.com/unefoutuebete/eu-vignette.git
 cd eu-vignette
 ```
+
+### HTML preview (no Mac required)
+
+Open the interactive browser demo on your phone or desktop — includes the map with timeline slider:
+
+**https://htmlpreview.github.io/?https://raw.githubusercontent.com/unefoutuebete/eu-vignette/cursor/map-timeline-f827/demo/index.html**
 
 2. Open the Xcode project:
 
