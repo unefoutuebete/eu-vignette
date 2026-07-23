@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>EU Vignette — Demo</title>
+  <style>
+    :root {
+      --blue: #2566e6;
+      --green: #34c759;
+      --red: #ff3b30;
+      --orange: #ff9500;
+      --bg: #f2f2f7;
+      --card: #ffffff;
+      --text: #1c1c1e;
+      --secondary: #8e8e93;
+      --separator: #e5e5ea;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .screen { display: none; flex: 1; flex-direction: column; padding-bottom: calc(72px + var(--safe-bottom)); }
+    .screen.active { display: flex; }
+    .nav {
+      background: rgba(242,242,247,0.92);
+      backdrop-filter: blur(20px);
+      padding: 12px 16px 8px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 0.5px solid var(--separator);
+    }
+    .nav h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.4px; }
+    .nav-row { display: flex; align-items: center; gap: 8px; }
+    .nav-row h1 { font-size: 17px; font-weight: 600; flex: 1; text-align: center; }
+    .back-btn {
+      background: none; border: none; color: var(--blue);
+      font-size: 17px; cursor: pointer; padding: 4px 0; min-width: 60px; text-align: left;
+    }
+    .icon-btn {
+      background: none; border: none; color: var(--blue);
+      font-size: 22px; cursor: pointer; min-width: 44px; min-height: 44px;
+    }
+    .search {
+      margin-top: 8px;
+      background: rgba(118,118,128,0.12);
+      border: none; border-radius: 10px;
+      padding: 10px 12px; font-size: 17px; width: 100%;
+    }
+    .content { flex: 1; overflow-y: auto; padding: 0 0 16px; }
+    .list { background: var(--card); margin: 16px; border-radius: 12px; overflow: hidden; }
+    .list-flush { margin: 0; border-radius: 0; }
+    .row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-bottom: 0.5px solid var(--separator);
+      cursor: pointer; background: var(--card);
+    }
+    .row:last-child { border-bottom: none; }
+    .row:active { background: #f0f0f5; }
+    .flag { font-size: 36px; line-height: 1; }
+    .flag-sm { font-size: 24px; }
+    .row-body { flex: 1; min-width: 0; }
+    .row-title { font-size: 17px; font-weight: 600; }
+    .row-sub { font-size: 15px; color: var(--secondary); margin-top: 2px; line-height: 1.3; }
+    .chevron { color: var(--secondary); font-size: 14px; }
+    .section-label {
+      font-size: 13px; font-weight: 400; color: var(--secondary);
+      text-transform: uppercase; padding: 20px 16px 8px; letter-spacing: 0.2px;
+    }
+    .price { color: var(--blue); font-weight: 600; font-size: 15px; }
+    .badge {
+      font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 999px;
+    }
+    .badge-green { background: rgba(52,199,89,0.15); color: #248a3d; }
+    .badge-orange { background: rgba(255,149,0,0.15); color: #c93400; }
+    .badge-red { background: rgba(255,59,48,0.15); color: var(--red); }
+    .plate { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 15px; }
+    .meta { font-size: 13px; color: var(--secondary); margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-link {
+      display: block; width: 100%; text-align: left;
+      background: none; border: none; color: var(--blue);
+      font-size: 17px; padding: 12px 16px; cursor: pointer;
+    }
+    .btn-link:active { background: #f0f0f5; }
+    .tip { display: flex; gap: 8px; padding: 10px 16px; font-size: 15px; align-items: flex-start; }
+    .empty {
+      text-align: center; padding: 60px 32px; color: var(--secondary);
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+    .empty h2 { font-size: 20px; color: var(--text); margin-bottom: 8px; font-weight: 600; }
+    .tabs {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px;
+      background: rgba(249,249,249,0.94);
+      backdrop-filter: blur(20px);
+      border-top: 0.5px solid var(--separator);
+      display: flex;
+      padding-bottom: var(--safe-bottom);
+    }
+    .tab {
+      flex: 1; border: none; background: none;
+      padding: 6px 0 4px; cursor: pointer;
+      color: var(--secondary); font-size: 10px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .tab.active { color: var(--blue); }
+    .tab-icon { font-size: 22px; line-height: 1; }
+    .hero { padding: 16px; display: flex; gap: 16px; align-items: flex-start; }
+    .hero .flag { font-size: 56px; }
+    .hero h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .hero p { font-size: 15px; color: var(--secondary); line-height: 1.4; }
+    .banner {
+      background: #fff8e6; border: 1px solid #ffe08a;
+      margin: 12px 16px 0; padding: 12px 14px; border-radius: 10px;
+      font-size: 14px; line-height: 1.4; color: #7a5c00;
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">📱 Interactive demo — open on your phone. Native app requires Xcode on a Mac to install.</div>
+
+  <!-- Countries -->
+  <div id="screen-countries" class="screen active">
+    <div class="nav">
+      <h1>Countries</h1>
+      <input class="search" placeholder="Search countries" oninput="filterCountries(this.value)">
+    </div>
+    <div class="content">
+      <div class="list" id="country-list"></div>
+    </div>
+  </div>
+
+  <!-- Country Detail -->
+  <div id="screen-detail" class="screen">
+    <div class="nav">
+      <div class="nav-row">
+        <button class="back-btn" onclick="showScreen('countries')">← Countries</button>
+        <h1 id="detail-title">Country</h1>
+        <span style="min-width:60px"></span>
+      </div>
+    </div>
+    <div class="content" id="detail-content"></div>
+  </div>
+
+  <!-- Vignettes -->
+  <div id="screen-vignettes" class="screen">
+    <div class="nav">
+      <div class="nav-row">
+        <h1 style="text-align:left">My Vignettes</h1>
+        <button class="icon-btn" title="Add">＋</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="list">
+        <div class="row" style="flex-direction:column;align-items:stretch;cursor:default">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="flag-sm">🇦🇹</span>
+            <span class="row-title">Austria</span>
+            <span style="flex:1"></span>
+            <span class="badge badge-green">7 days left</span>
+          </div>
+          <div class="plate">W-1234AB</div>
+          <div class="meta"><span>🕐 10 days</span><span>Expires Aug 1, 2026</span></div>
+        </div>
+        <div class="row" style="flex-direction:column;align-items:stretch;cursor:default">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="flag-sm">🇨🇭</span>
+            <span class="row-title">Switzerland</span>
+            <span style="flex:1"></span>
+            <span class="badge badge-orange">Expires today</span>
+          </div>
+          <div class="plate">ZH-567890</div>
+          <div class="meta"><span>🕐 1 year</span><span>Expires Jul 23, 2026</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trips -->
+  <div id="screen-trips" class="screen">
+    <div class="nav">
+      <div class="nav-row">
+        <h1 style="text-align:left">Trip Planner</h1>
+        <button class="icon-btn">＋</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="list">
+        <div class="row">
+          <div class="row-body">
+            <div class="row-title">Alpine Road Trip</div>
+            <div class="row-sub">Jul 25 – Aug 2, 2026</div>
+            <div style="font-size:22px;margin-top:6px">🇦🇹 🇨🇭 🇸🇮</div>
+          </div>
+          <span class="chevron">›</span>
+        </div>
+        <div class="row">
+          <div class="row-body">
+            <div class="row-title">Eastern Europe</div>
+            <div class="row-sub">Aug 10 – Aug 20, 2026</div>
+            <div style="font-size:22px;margin-top:6px">🇭🇺 🇨🇿 🇸🇰</div>
+          </div>
+          <span class="chevron">›</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div id="screen-settings" class="screen">
+    <div class="nav"><h1>Settings</h1></div>
+    <div class="content">
+      <div class="section-label">Vehicle</div>
+      <div class="list list-flush">
+        <div class="row" style="cursor:default">
+          <div class="row-body">
+            <div class="row-sub">Default license plate</div>
+            <div class="plate" style="margin-top:4px">W-1234AB</div>
+          </div>
+        </div>
+      </div>
+      <div class="section-label">Notifications</div>
+      <div class="list list-flush">
+        <div class="row" style="cursor:default;justify-content:space-between">
+          <span>Expiry reminders</span>
+          <span style="color:var(--green);font-weight:600">On</span>
+        </div>
+        <div class="row" style="cursor:default;justify-content:space-between">
+          <span>Permission status</span>
+          <span class="row-sub">Allowed</span>
+        </div>
+      </div>
+      <div class="section-label">About</div>
+      <div class="list list-flush">
+        <div class="row" style="cursor:default;justify-content:space-between">
+          <span>Version</span>
+          <span class="row-sub">1.0.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="countries" onclick="switchTab('countries')">
+      <span class="tab-icon">🌍</span>Countries
+    </button>
+    <button class="tab" data-tab="vignettes" onclick="switchTab('vignettes')">
+      <span class="tab-icon">🚗</span>Vignettes
+    </button>
+    <button class="tab" data-tab="trips" onclick="switchTab('trips')">
+      <span class="tab-icon">🗺️</span>Trips
+    </button>
+    <button class="tab" data-tab="settings" onclick="switchTab('settings')">
+      <span class="tab-icon">⚙️</span>Settings
+    </button>
+  </nav>
+
+  <script>
+    const countries = [
+      { id:"AT", name:"Austria", flag:"🇦🇹", summary:"Digital or physical vignette required on all Austrian motorways and expressways.",
+        options:[["1 day","€8.60"],["10 days","€11.50"],["2 months","€28.90"],["1 year","€96.40"]],
+        tips:["Buy only from the official ASFINAG shop.","Register your license plate correctly.","Section tolls are billed separately."],
+        url:"https://shop.asfinag.at/en/" },
+      { id:"CH", name:"Switzerland", flag:"🇨🇭", summary:"Annual vignette linked to your license plate required on Swiss motorways.",
+        options:[["1 year","CHF 40"]],
+        tips:["Purchase from via.admin.ch.","Digital vignette is tied to your plate."],
+        url:"https://via.admin.ch/shop/" },
+      { id:"SI", name:"Slovenia", flag:"🇸🇮", summary:"E-vignette registered to your license plate required on motorways.",
+        options:[["7 days","€16.00"],["1 month","€32.00"],["1 year","€117.50"]],
+        tips:["Set start date before entering motorways."],
+        url:"https://evinjeta.dars.si/en" },
+      { id:"HU", name:"Hungary", flag:"🇭🇺", summary:"E-matrica system — purchase and register your plate before toll roads.",
+        options:[["10 days","HUF 6,400"],["1 month","HUF 10,360"],["1 year","HUF 57,600"]],
+        tips:["County and motorway vignettes differ."],
+        url:"https://ematrica.nemzetiutdij.hu/en/" },
+      { id:"CZ", name:"Czech Republic", flag:"🇨🇿", summary:"Motorway vignette linked to your license plate is mandatory.",
+        options:[["1 day","CZK 200"],["10 days","CZK 270"],["1 month","CZK 430"],["1 year","CZK 2,440"]],
+        tips:["Set start date before entering motorways."],
+        url:"https://edalnice.cz/en/index.html" },
+      { id:"SK", name:"Slovakia", flag:"🇸🇰", summary:"Electronic vignette registered to your license plate required.",
+        options:[["1 day","€8.10"],["10 days","€10.80"],["1 month","€17.10"],["1 year","€90.00"]],
+        tips:["Verify plate country code during checkout."],
+        url:"https://eznamka.sk/en/" },
+      { id:"RO", name:"Romania", flag:"🇷🇴", summary:"Rovinieta electronic toll system tied to vehicle registration.",
+        options:[["7 days","RON varies"],["30 days","RON varies"],["1 year","RON varies"]],
+        tips:["Tariffs depend on vehicle category."],
+        url:"https://www.roviniete.ro/en/" },
+      { id:"BG", name:"Bulgaria", flag:"🇧🇬", summary:"E-vignette linked to your license plate required on motorways.",
+        options:[["7 days","BGN varies"],["1 month","BGN varies"],["1 year","BGN varies"]],
+        tips:["Activate before entering tolled sections."],
+        url:"https://www.bgtoll.bg/en" },
+      { id:"MD", name:"Moldova", flag:"🇲🇩", summary:"Electronic road vignette for designated national road networks.",
+        options:[["7 days","MDL varies"],["15 days","MDL varies"],["30 days","MDL varies"]],
+        tips:["Confirm route coverage before purchase."],
+        url:"https://vinieta.gov.md/en/" }
+    ];
+
+    function renderCountries(list) {
+      document.getElementById('country-list').innerHTML = list.map(c => `
+        <div class="row" onclick="openCountry('${c.id}')">
+          <span class="flag">${c.flag}</span>
+          <div class="row-body">
+            <div class="row-title">${c.name}</div>
+            <div class="row-sub">${c.summary}</div>
+          </div>
+          <span class="chevron">›</span>
+        </div>`).join('');
+    }
+
+    function filterCountries(q) {
+      const f = q.trim().toLowerCase();
+      renderCountries(f ? countries.filter(c => c.name.toLowerCase().includes(f) || c.id.toLowerCase().includes(f)) : countries);
+    }
+
+    function openCountry(id) {
+      const c = countries.find(x => x.id === id);
+      document.getElementById('detail-title').textContent = c.name;
+      document.getElementById('detail-content').innerHTML = `
+        <div class="hero">
+          <span class="flag">${c.flag}</span>
+          <div><h2>${c.name}</h2><p>${c.summary}</p></div>
+        </div>
+        <div class="section-label">Vignette options</div>
+        <div class="list list-flush">${c.options.map(([l,p]) => `
+          <div class="row" style="cursor:default;justify-content:space-between">
+            <span class="row-title" style="font-weight:500">${l}</span>
+            <span class="price">${p}</span>
+          </div>`).join('')}</div>
+        <div class="section-label">Travel tips</div>
+        <div class="list list-flush">${c.tips.map(t => `
+          <div class="tip">💡 <span>${t}</span></div>`).join('')}</div>
+        <div class="section-label">Official links</div>
+        <div class="list list-flush">
+          <button class="btn-link" onclick="window.open('${c.url}','_blank')">🛒 Buy on official portal</button>
+        </div>`;
+      showScreen('detail');
+    }
+
+    function showScreen(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + name).classList.add('active');
+      if (name === 'detail') {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      }
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+      showScreen(tab);
+    }
+
+    renderCountries(countries);
+  </script>
+</body>
+</html>
